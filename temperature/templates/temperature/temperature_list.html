@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Temperature Readings</title>
+</head>
+<body>
+    <h1>Temperature Readings</h1>
+    <table border="1">
+        <tr>
+            <th>Timestamp</th>
+            <th>Temperature (°C)</th>
+        </tr>
+        {% for reading in readings %}
+            <tr>
+                <td>{{ reading.timestamp }}</td>
+                <td>{{ reading.temperature }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
