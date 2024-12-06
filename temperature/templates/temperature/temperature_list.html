@@ -2,9 +2,13 @@
 <html>
 <head>
     <title>Temperature Readings</title>
+    <!-- Add Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Temperature Readings</h1>
+    
+    <!-- Temperature Table -->
     <table border="1">
         <tr>
             <th>Timestamp</th>
@@ -17,5 +21,49 @@
             </tr>
         {% endfor %}
     </table>
+
+    <!-- Canvas for Chart.js -->
+    <h2>Temperature Over Time</h2>
+    <canvas id="temperatureChart" width="400" height="200"></canvas>
+
+    <!-- JavaScript to render the chart -->
+    <script>
+        var ctx = document.getElementById('temperatureChart').getContext('2d');
+        var temperatureData = {
+            labels: [ {% for reading in readings %} "{{ reading.timestamp }}", {% endfor %} ],
+            datasets: [{
+                label: 'Temperature (°C)',
+                data: [ {% for reading in readings %} {{ reading.temperature }}, {% endfor %} ],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false,
+            }]
+        };
+
+        var config = {
+            type: 'line',
+            data: temperatureData,
+            options: {
+                scales: {
+                    x: {
+                        type: 'category',
+                        title: {
+                            display: true,
+                            text: 'Timestamp'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Temperature (°C)'
+                        }
+                    }
+                }
+            }
+        };
+
+        // Render the chart
+        var temperatureChart = new Chart(ctx, config);
+    </script>
 </body>
 </html>

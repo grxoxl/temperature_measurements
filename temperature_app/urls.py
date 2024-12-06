@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('temperature/', include('temperature.urls')),  # Include temperature app URLs
+    path('temperature/', include('temperature.urls')),  # Adjust app name as needed
 ]
