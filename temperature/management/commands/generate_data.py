@@ -1,4 +1,4 @@
-import random
+import numpy as np
 from datetime import datetime, timedelta
 from influxdb_client import InfluxDBClient, Point
 from django.core.management.base import BaseCommand
@@ -23,7 +23,8 @@ class Command(BaseCommand):
             write_api = client.write_api(write_options=SYNCHRONOUS)
             delete_api = client.delete_api()
             for i in range(100):
-                temperature = random.gauss(24, 5)
+                temperature = np.random.normal(21, 0.5)
+   
                 timestamp = datetime.utcnow() - timedelta(minutes=i)
                 point = Point('temperature') \
                     .tag("location", "home") \

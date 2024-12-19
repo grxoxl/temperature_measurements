@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.shortcuts import redirect, render
+from django.http import JsonResponse
 
 User = get_user_model()
 
@@ -28,14 +29,15 @@ def register_user(request):
     return render(request, 'account/register.html', {'form': form}) 
 
 def login_user(request):
-
     form = LoginForm()
 
+    # Check if user is already authenticated
     if request.user.is_authenticated:
+        if request.headers.get("X-Telegram-Bot"):  # For Telegram bot authentication
+            return JsonResponse({"authenticated": True, "message": "Already logged in."})
         return redirect('basepage:home')
 
     if request.method == 'POST':
-
         form = LoginForm(request.POST, request.FILES)
 
         username = request.POST.get('username')
@@ -45,14 +47,47 @@ def login_user(request):
 
         if user is not None:
             login(request, user)
+            if request.headers.get("X-Telegram-Bot"):  # For Telegram bot authentication
+                return JsonResponse({"authenticated": True, "message": "Authentication successful."})
             return redirect('basepage:home')
         else:
+            if request.headers.get("X-Telegram-Bot"):  # For Telegram bot authentication
+                return JsonResponse({"authenticated": False, "message": "Invalid credentials."})
             messages.info(request, 'Username or Password is incorrect')
             return redirect('account:login')
-    context = {
-        'form': form
-    }
+
+    if request.headers.get("X-Telegram-Bot"):  # If bot requests GET (unauthenticated)
+        return JsonResponse({"authenticated": False, "message": "Please log in via POST request."})
+
+    context = {'form': form}
     return render(request, 'account/login.html', context)
+
+# def login_user(request):
+
+#     form = LoginForm()
+
+#     if request.user.is_authenticated:
+#         return redirect('basepage:home')
+
+#     if request.method == 'POST':
+
+#         form = LoginForm(request.POST, request.FILES)
+
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+
+#         user = authenticate(request, username=username, password=password)
+
+#         if user is not None:
+#             login(request, user)
+#             return redirect('basepage:home')
+#         else:
+#             messages.info(request, 'Username or Password is incorrect')
+#             return redirect('account:login')
+#     context = {
+#         'form': form
+#     }
+#     return render(request, 'account/login.html', context)
 
 
 def logout_user(request):
