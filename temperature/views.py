@@ -71,6 +71,10 @@ def temperature_data(request):
                 })
         
         # Render data in a template
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':  # Check if it's an AJAX request
+            return JsonResponse({"readings": data})
+
+        # Render data in a template
         return render(request, 'temperature/temperature_list.html', {'readings': data})
 
     except Exception as e:
