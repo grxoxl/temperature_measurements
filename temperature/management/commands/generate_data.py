@@ -19,7 +19,7 @@ class Command(BaseCommand):
                 org= self.org
             )
             write_api = client.write_api(write_options=SYNCHRONOUS)
-            for i in range(100):
+            for i in range(500):
                 temperature = random.uniform(18.0, 30.0)
                 timestamp = datetime.utcnow() - timedelta(minutes=i)
                 point = Point('temperature') \

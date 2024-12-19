@@ -19,12 +19,22 @@ def get_temperature_data(request):
         # Write the query to retrieve the last 100 points
         query = f'''
         from(bucket: "{INFLUXDB_BUCKET}")
-          |> range(start: -1h)
+          |> range(start: -24h)
           |> filter(fn: (r) => r._measurement == "temperature")
           |> keep(columns: ["_time", "_value"])
           |> sort(columns: ["_time"], desc: true)
           |> limit(n: 100)
         '''
+        # query = f'''
+        # from(bucket: "{INFLUXDB_BUCKET}")
+        # |> range(start: -24h)  # Retrieve data for the last 24 hours
+        # |> filter(fn: (r) => r._measurement == "temperature")
+        # |> keep(columns: ["_time", "_value"])
+        # |> sort(columns: ["_time"], desc: true)
+        # |> limit(n: 100)
+        # '''
+
+
         tables = query_api.query(query)
 
         # Extract data points
@@ -37,7 +47,7 @@ def get_temperature_data(request):
                 })
 
         # Return as JSON response
-        return JsonResponse({"data": data}, safe=False)
+        return JsonResponse({"data": data}, safe=True)
     
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
@@ -50,12 +60,20 @@ def temperature_data(request):
         # Query to get temperature data
         query = f'''
         from(bucket: "{INFLUXDB_BUCKET}")
-          |> range(start: -1h)
+          |> range(start: -24h)
           |> filter(fn: (r) => r._measurement == "temperature")
           |> keep(columns: ["_time", "_value"])
           |> sort(columns: ["_time"], desc: true)
           |> limit(n: 100)
         '''
+        # query = f'''
+        # from(bucket: "{INFLUXDB_BUCKET}")
+        # |> range(start: -24h)  # Retrieve data for the last 24 hours
+        # |> filter(fn: (r) => r._measurement == "temperature")
+        # |> keep(columns: ["_time", "_value"])
+        # |> sort(columns: ["_time"], desc: true)
+        # |> limit(n: 100)
+        # '''
         tables = query_api.query(query)
 
         # Parse query results into a list of dictionaries
