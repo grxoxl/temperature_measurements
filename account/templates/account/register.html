@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register New Account{% endblock title %}
+
+<!-- Override the device_section to remove the devices heading/card -->
+{% block device_section %}{% endblock device_section %}
+
+{% block extra_head %}
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        /* A subtle gradient background for the entire page */
+        background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+    }
+
+    main {
+        background: none; /* Use the gradient background from body */
+        box-shadow: none;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    .form-container {
+        max-width: 400px;
+        margin: 3rem auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        padding: 2rem;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .form-container h3 {
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        color: #333;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .form-container form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-container .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-container label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .form-container input[type="text"],
+    .form-container input[type="email"],
+    .form-container input[type="password"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-container input[type="text"]:focus,
+    .form-container input[type="email"]:focus,
+    .form-container input[type="password"]:focus {
+        border-color: #35495e;
+        outline: none;
+    }
+
+    .btn-register {
+        background-color: #35495e;
+        border: none;
+        color: #fff;
+        font-size: 1rem;
+        padding: 0.75rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        margin-top: 1rem;
+        font-weight: 500;
+    }
+
+    .btn-register:hover {
+        background-color: forestgreen;
+        transform: scale(1.02);
+    }
+
+    .form-note {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .form-note a {
+        color: #35495e;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .form-note a:hover {
+        text-decoration: underline;
+    }
+
+    /* Fade-in animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Adjust spacing for mobile */
+    @media (max-width: 480px) {
+        .form-container {
+            margin: 2rem 1rem;
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock extra_head %}
+
+{% block content %}
+<div class="form-container">
+    <h3>Create New Account</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn-register">Register</button>
+    </form>
+    <div class="form-note">
+        <a href="{% url 'account:login' %}">Already have an account?</a>
+    </div>
+</div>
+{% endblock content %}

@@ -7,7 +7,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 class Command(BaseCommand):
     help = 'Generates synthetic temperature data'
     url = 'http://localhost:8086'
-    token = 'BgmcjiYgjhHiXwb2hF5aAqFFPU_Y6AUDU_E2gZy-5uOjCXMp60YUf6PyuBJsqbcvEvnl-bsIl56LCJyQ19UrOg=='
+    token = 'eysyl_gzK_cXoZXY0VAyEK3OSHai7B4wtCOD6xrRsrEdIjn5eSrR7QwLb5MDXw94vJcX88XCyxV2A5p9JMpu0w=='
     org = 'GGWP'
 
     def handle(self, *args, **kwargs):
@@ -32,3 +32,4 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(f'Error generating data: {e}'))
         finally:
             client.close()
+    
