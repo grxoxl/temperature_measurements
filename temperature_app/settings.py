@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'account',
     'crispy_forms',
     'crispy_bootstrap5',
+    'bot',
 ]
 
 MIDDLEWARE = [
@@ -85,20 +86,37 @@ WSGI_APPLICATION = 'temperature_app.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         "NAME": "sh_rdb",
+#         "USER": "sh_rdb_user",
+#         "PASSWORD": "8857",
+#         "HOST": "localhost",
+#         "PORT": "5432"             # Default PostgreSQL port
+#     }
+# }
+
+# INFLUXDB = {
+#     'url': 'http://localhost:8086',        # InfluxDB URL
+#     'token': 'zzB-NhjH4PwejAcsFGJxNMtXIgCnvM1VBtvSbVPN3AvYqzyEstiJnCKpX3el4ZAHGijqrBAvE6FBflPHYxH0tQ==',                 # Replace with the token you generated
+#     'org': 'GGWP',                         # Organization name you created
+#     'bucket': 'temperature_data'           # Bucket name you created
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        "NAME": "sh_rdb",
-        "USER": "sh_rdb_user",
-        "PASSWORD": "8857",
-        "HOST": "localhost",
-        "PORT": "5432"             # Default PostgreSQL port
+        'NAME': 'temperature_db',      # Your database name
+        'USER': 'temperature_user',    # Your database username
+        'PASSWORD': 'SQ2E4TF',   # Your database password
+        'HOST': 'localhost',           # Default PostgreSQL host
+        'PORT': '5432',                # Default PostgreSQL port
     }
 }
-
 INFLUXDB = {
     'url': 'http://localhost:8086',        # InfluxDB URL
-    'token': '0bv3UsdNV7CudF0K5T8ipqlK7txjqc5n4yjnqS8G1jkVFarRbh_0tHJ4yK7q6aqpqgQwHnFMk3vtvRGUbvO6cA==',                 # Replace with the token you generated
+    'token': '0XwDiOcizfZ7Yl3WsdwPsrXKVtPYVyVFWau0aOgrmRGVG1x3Ri7gG0HWegLryyT5592CGgFDmzBHQtHMW_agAg==',                 # Replace with the token you generated
     'org': 'GGWP',                         # Organization name you created
     'bucket': 'temperature_data'           # Bucket name you created
 }

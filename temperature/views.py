@@ -2,16 +2,18 @@ from django.http import JsonResponse, HttpResponse
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.query_api import QueryApi
 from django.shortcuts import render, redirect
+from django.conf import settings
 
 # Replace these with your actual InfluxDB settings
-INFLUXDB_URL = "http://localhost:8086"
-INFLUXDB_TOKEN = 'eysyl_gzK_cXoZXY0VAyEK3OSHai7B4wtCOD6xrRsrEdIjn5eSrR7QwLb5MDXw94vJcX88XCyxV2A5p9JMpu0w=='
-INFLUXDB_ORG = 'GGWP'
-INFLUXDB_BUCKET = "temperature_data"
+
+INFLUXDB_URL = settings.INFLUXDB["url"]
+INFLUXDB_TOKEN = settings.INFLUXDB["token"]
+INFLUXDB_ORG = settings.INFLUXDB["org"]
+INFLUXDB_BUCKET = settings.INFLUXDB["bucket"]
 
 def get_temperature_data(request):
-    if not request.user.is_authenticated:
-        return redirect('account:login')
+    # if not request.user.is_authenticated:
+    #     return redirect('account:login')
     try:
         # Initialize the InfluxDB client
         client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)

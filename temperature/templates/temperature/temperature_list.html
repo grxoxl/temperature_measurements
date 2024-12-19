@@ -67,6 +67,24 @@
         height: 400px;
     }
 
+    .telegram-button {
+        display: inline-block;
+        background-color: #0088cc;
+        color: white;
+        font-size: 16px;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .telegram-button:hover {
+        background-color: #005f87;
+    }
+
     @media (max-width: 768px) {
         .data-container {
             flex-direction: column;
@@ -122,6 +140,13 @@
             <canvas id="temperatureChart"></canvas>
         </div>
     </div>
+</div>
+
+<!-- Add Telegram button here -->
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="https://web.telegram.org/k/#@TempParserBot" class="telegram-button" target="_blank">
+        Open Telegram Bot
+    </a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

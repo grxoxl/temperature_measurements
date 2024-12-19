@@ -3,12 +3,14 @@ from datetime import datetime, timedelta
 from influxdb_client import InfluxDBClient, Point
 from django.core.management.base import BaseCommand
 from influxdb_client.client.write_api import SYNCHRONOUS
+from django.conf import settings
 
 class Command(BaseCommand):
     help = 'Generates synthetic temperature data'
-    url = 'http://localhost:8086'
-    token = 'eysyl_gzK_cXoZXY0VAyEK3OSHai7B4wtCOD6xrRsrEdIjn5eSrR7QwLb5MDXw94vJcX88XCyxV2A5p9JMpu0w=='
-    org = 'GGWP'
+    url = settings.INFLUXDB["url"]
+    token = settings.INFLUXDB["token"]
+    org = settings.INFLUXDB["org"]
+
 
     def handle(self, *args, **kwargs):
         try:
