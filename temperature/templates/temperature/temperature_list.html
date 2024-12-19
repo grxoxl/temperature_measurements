@@ -2,25 +2,24 @@
 
 {% block title %}Temperature Data{% endblock title %}
 
-<!-- Override the device_section to remove the device card and heading -->
 {% block device_section %}{% endblock device_section %}
 
 {% block content %}
 <style>
     .data-container {
         display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
+        flex-direction: column;
+        align-items: center; /* Center align the content */
         margin-bottom: 2rem;
-        align-items: flex-start;
+        gap: 2rem;
     }
 
     .data-table {
-        flex: 0 0 auto;
         max-width: 400px;
-        overflow-x: auto;
+        max-height: 300px;
+        overflow-y: auto;
         background: #fff;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         border-radius: 4px;
     }
 
@@ -29,10 +28,12 @@
         border-collapse: collapse;
     }
 
-    .data-table th, .data-table td {
-        padding: 0.75rem;
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem;
         text-align: left;
         white-space: nowrap;
+        font-size: 0.9rem;
     }
 
     .data-table thead tr {
@@ -45,15 +46,11 @@
     }
 
     .chart-container {
-        flex: 1 1 auto;
-        min-width: 400px;
+        width: 80%; /* Ensure the chart takes up a significant part of the width */
         background: #fff;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         border-radius: 4px;
         padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
     }
 
     .chart-container h2 {
@@ -85,17 +82,34 @@
         background-color: #005f87;
     }
 
-    @media (max-width: 768px) {
-        .data-container {
-            flex-direction: column;
-        }
-        .data-table, .chart-container {
-            max-width: 100%;
-        }
+    .telegram-button {
+        display: inline-block;
+        background-color: #0088cc;
+        color: white;
+        font-size: 16px;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .telegram-button:hover {
+        background-color: #005f87;
+    }
+
+    .refresh-indicator {
+        text-align: center;
+        color: #666;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        font-style: italic;
     }
 </style>
 
-<h1>Temperature Readings</h1>
+<h1 style="text-align: center;">Temperature Readings</h1>
 <div class="data-container">
     <div class="data-table">
         <table>
@@ -105,11 +119,11 @@
                     <th>Temperature (°C)</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="data-table-body">
                 {% if readings|length > 10 %}
                     {% for reading in readings|slice:":5" %}
                     <tr>
-                        <td>{{ reading.timestamp|date:"Y-m-d H:i" }}</td>
+                        <td>{{ reading.timestamp|date:"H:i:s" }}</td>
                         <td>{{ reading.temperature|floatformat:2 }}</td>
                     </tr>
                     {% endfor %}
@@ -118,14 +132,14 @@
                     </tr>
                     {% for reading in readings|slice:"-5:" %}
                     <tr>
-                        <td>{{ reading.timestamp|date:"Y-m-d H:i" }}</td>
+                        <td>{{ reading.timestamp|date:"H:i:s" }}</td>
                         <td>{{ reading.temperature|floatformat:2 }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     {% for reading in readings %}
                     <tr>
-                        <td>{{ reading.timestamp|date:"Y-m-d H:i" }}</td>
+                        <td>{{ reading.timestamp|date:"H:i:s" }}</td>
                         <td>{{ reading.temperature|floatformat:2 }}</td>
                     </tr>
                     {% endfor %}
@@ -138,7 +152,6 @@
         <h2>Temperature Over Time</h2>
         <div class="chart-wrapper">
             <canvas id="temperatureChart"></canvas>
-        </div>
     </div>
 </div>
 
@@ -150,32 +163,22 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    var allTimestamps = [{% for reading in readings %}"{{ reading.timestamp|date:"Y-m-d H:i" }}",{% endfor %}];
-    var allTemperatures = [{% for reading in readings %}{{ reading.temperature|floatformat:2 }},{% endfor %}];
-
-    // If needed, limit the number of displayed data points
-    if (allTimestamps.length > 100) {
-        allTimestamps = allTimestamps.slice(-100);
-        allTemperatures = allTemperatures.slice(-100);
-    }
-
-    var ctx = document.getElementById('temperatureChart').getContext('2d');
-    var temperatureData = {
-        labels: allTimestamps,
-        datasets: [{
-            label: 'Temperature (°C)',
-            data: allTemperatures,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.1
-        }]
-    };
-
-    var config = {
+    const ctx = document.getElementById('temperatureChart').getContext('2d');
+    let temperatureChart = new Chart(ctx, {
         type: 'line',
-        data: temperatureData,
+        data: {
+            labels: [{% for reading in readings %}"{{ reading.timestamp|date:"H:i:s" }}",{% endfor %}],
+            datasets: [{
+                label: 'Temperature (°C)',
+                data: [{% for reading in readings %}{{ reading.temperature|floatformat:2 }},{% endfor %}],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.1
+            }]
+        },
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -188,7 +191,9 @@
                     },
                     ticks: {
                         maxRotation: 45,
-                        minRotation: 0
+                        minRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 10
                     }
                 },
                 y: {
@@ -205,8 +210,76 @@
                 }
             }
         }
-    };
+    });
 
-    new Chart(ctx, config);
+    function fetchTemperatureData() {
+        $.ajax({
+            url: "{% url 'temperature_data' %}",
+            method: "GET",
+            dataType: "json",
+            beforeSend: function() {
+                $("#refresh-indicator").text("Refreshing data...");
+            },
+            success: function(response) {
+                const labels = response.readings.map(reading => reading.timestamp);
+                const data = response.readings.map(reading => reading.temperature);
+
+                // Update chart
+                temperatureChart.data.labels = labels.slice(-50); // Display last 50 records
+                temperatureChart.data.datasets[0].data = data.slice(-50);
+                temperatureChart.update();
+
+                // Update table
+                const tableBody = document.getElementById('data-table-body');
+                tableBody.innerHTML = "";
+
+                if (response.readings.length > 10) {
+                    response.readings.slice(0, 5).forEach(reading => {
+                        const row = `
+                            <tr>
+                                <td>${reading.timestamp}</td>
+                                <td>${reading.temperature.toFixed(2)}</td>
+                            </tr>`;
+                        tableBody.insertAdjacentHTML('beforeend', row);
+                    });
+
+                    tableBody.insertAdjacentHTML('beforeend', `
+                        <tr>
+                            <td colspan="2" style="text-align:center; font-style:italic;">...</td>
+                        </tr>
+                    `);
+
+                    response.readings.slice(-5).forEach(reading => {
+                        const row = `
+                            <tr>
+                                <td>${reading.timestamp}</td>
+                                <td>${reading.temperature.toFixed(2)}</td>
+                            </tr>`;
+                        tableBody.insertAdjacentHTML('beforeend', row);
+                    });
+
+                } else {
+                    response.readings.forEach(reading => {
+                        const row = `
+                            <tr>
+                                <td>${reading.timestamp}</td>
+                                <td>${reading.temperature.toFixed(2)}</td>
+                            </tr>`;
+                        tableBody.insertAdjacentHTML('beforeend', row);
+                    });
+                }
+
+                $("#refresh-indicator").text("Data refreshed!");
+            },
+            error: function(err) {
+                console.error("Error fetching temperature data:", err);
+                $("#refresh-indicator").text("Error refreshing data");
+            }
+        });
+    }
+
+    // Fetch data every 1 second
+    setInterval(fetchTemperatureData, 1000);
+    fetchTemperatureData();
 </script>
 {% endblock content %}
