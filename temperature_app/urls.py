@@ -19,5 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('basepage.urls', namespace='basepage')),
     path('temperature/', include('temperature.urls')),  # Adjust app name as needed
+    path("account/", include("account.urls", namespace='account')),       
 ]

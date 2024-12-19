@@ -1,69 +1,187 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Temperature Readings</title>
-    <!-- Add Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <h1>Temperature Readings</h1>
-    
-    <!-- Temperature Table -->
-    <table border="1">
-        <tr>
-            <th>Timestamp</th>
-            <th>Temperature (°C)</th>
-        </tr>
-        {% for reading in readings %}
-            <tr>
-                <td>{{ reading.timestamp }}</td>
-                <td>{{ reading.temperature }}</td>
-            </tr>
-        {% endfor %}
-    </table>
+{% extends "base.html" %}
 
-    <!-- Canvas for Chart.js -->
-    <h2>Temperature </h2>
-    <canvas id="temperatureChart" width="400" height="200"></canvas>
+{% block title %}Temperature Data{% endblock title %}
 
-    <!-- JavaScript to render the chart -->
-    <script>
-        var ctx = document.getElementById('temperatureChart').getContext('2d');
-        var temperatureData = {
-            labels: [ {% for reading in readings %} "{{ reading.timestamp }}", {% endfor %} ],
-            datasets: [{
-                label: 'Temperature (°C)',
-                data: [ {% for reading in readings %} {{ reading.temperature }}, {% endfor %} ],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                fill: false,
-            }]
-        };
+<!-- Override the device_section to remove the device card and heading -->
+{% block device_section %}{% endblock device_section %}
 
-        var config = {
-            type: 'line',
-            data: temperatureData,
-            options: {
-                scales: {
-                    x: {
-                        type: 'category',
-                        title: {
-                            display: true,
-                            text: 'Timestamp'
-                        }
+{% block content %}
+<style>
+    .data-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        align-items: flex-start;
+    }
+
+    .data-table {
+        flex: 0 0 auto;
+        max-width: 400px;
+        overflow-x: auto;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-radius: 4px;
+    }
+
+    .data-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th, .data-table td {
+        padding: 0.75rem;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .data-table thead tr {
+        background: #35495e;
+        color: #fff;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+
+    .chart-container {
+        flex: 1 1 auto;
+        min-width: 400px;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .chart-container h2 {
+        margin-top: 0;
+        text-align: center;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 400px;
+    }
+
+    @media (max-width: 768px) {
+        .data-container {
+            flex-direction: column;
+        }
+        .data-table, .chart-container {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<h1>Temperature Readings</h1>
+<div class="data-container">
+    <div class="data-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Temperature (°C)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if readings|length > 10 %}
+                    {% for reading in readings|slice:":5" %}
+                    <tr>
+                        <td>{{ reading.timestamp|date:"Y-m-d H:i" }}</td>
+                        <td>{{ reading.temperature|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="2" style="text-align:center; font-style:italic;">...</td>
+                    </tr>
+                    {% for reading in readings|slice:"-5:" %}
+                    <tr>
+                        <td>{{ reading.timestamp|date:"Y-m-d H:i" }}</td>
+                        <td>{{ reading.temperature|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    {% for reading in readings %}
+                    <tr>
+                        <td>{{ reading.timestamp|date:"Y-m-d H:i" }}</td>
+                        <td>{{ reading.temperature|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="chart-container">
+        <h2>Temperature Over Time</h2>
+        <div class="chart-wrapper">
+            <canvas id="temperatureChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var allTimestamps = [{% for reading in readings %}"{{ reading.timestamp|date:"Y-m-d H:i" }}",{% endfor %}];
+    var allTemperatures = [{% for reading in readings %}{{ reading.temperature|floatformat:2 }},{% endfor %}];
+
+    // If needed, limit the number of displayed data points
+    if (allTimestamps.length > 100) {
+        allTimestamps = allTimestamps.slice(-100);
+        allTemperatures = allTemperatures.slice(-100);
+    }
+
+    var ctx = document.getElementById('temperatureChart').getContext('2d');
+    var temperatureData = {
+        labels: allTimestamps,
+        datasets: [{
+            label: 'Temperature (°C)',
+            data: allTemperatures,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.1
+        }]
+    };
+
+    var config = {
+        type: 'line',
+        data: temperatureData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'category',
+                    title: {
+                        display: true,
+                        text: 'Timestamp'
                     },
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: true,
-                            text: 'Temperature (°C)'
-                        }
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 0
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Temperature (°C)'
                     }
                 }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                }
             }
-        };
+        }
+    };
 
-        // Render the chart
-        var temperatureChart = new Chart(ctx, config);
-    </script>
-</body>
-</html>
+    new Chart(ctx, config);
+</script>
+{% endblock content %}
