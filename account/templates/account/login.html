@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login{% endblock title %}
+
+<!-- Override the device_section so that no devices or show details button appear -->
+{% block device_section %}{% endblock device_section %}
+
+{% block extra_head %}
+<style>
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        /* A subtle gradient background */
+        background: linear-gradient(to bottom right, #ece9e6, #ffffff);
+    }
+
+    main {
+        background: transparent;
+        box-shadow: none;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Center the login card */
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 100px); /* Adjust for header/footer */
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 2rem;
+        width: 300px;
+        max-width: 90%;
+        text-align: center;
+    }
+
+    .form-card h3 {
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-card form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .form-card form .form-group {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .form-card label {
+        display: block;
+        text-align: left;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .form-card input[type="text"],
+    .form-card input[type="password"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .form-card input[type="text"]:focus,
+    .form-card input[type="password"]:focus {
+        border-color: #35495e;
+        outline: none;
+    }
+
+    .btn-login {
+        background-color: #35495e;
+        border: none;
+        color: #fff;
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        transition: 0.3s;
+        margin-top: 1rem;
+        font-weight: 500;
+    }
+
+    .btn-login:hover {
+        background-color: forestgreen;
+        transform: scale(1.02);
+    }
+
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+    }
+
+    .messages li {
+        margin-bottom: 0.5rem;
+        color: #c0392b;
+        font-weight: 500;
+    }
+
+    .form-note {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .form-note a {
+        color: #35495e;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .form-note a:hover {
+        text-decoration: underline;
+    }
+
+    footer {
+        background: none;
+        color: #999;
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 1rem;
+    }
+</style>
+{% endblock extra_head %}
+
+{% block content %}
+<div class="login-container">
+    <div class="form-card">
+        <h3>Authentication</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+
+        {% if form.errors %}
+        <ul class="messages">
+            {% for field in form %}
+                {% if field.errors %}
+                    <li>{{ field.errors }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="form-note">
+            <a href="{% url 'account:register' %}">Don't have an account?</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

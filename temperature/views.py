@@ -1,16 +1,17 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.query_api import QueryApi
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Replace these with your actual InfluxDB settings
 INFLUXDB_URL = "http://localhost:8086"
-INFLUXDB_TOKEN = 'BgmcjiYgjhHiXwb2hF5aAqFFPU_Y6AUDU_E2gZy-5uOjCXMp60YUf6PyuBJsqbcvEvnl-bsIl56LCJyQ19UrOg=='
+INFLUXDB_TOKEN = 'eysyl_gzK_cXoZXY0VAyEK3OSHai7B4wtCOD6xrRsrEdIjn5eSrR7QwLb5MDXw94vJcX88XCyxV2A5p9JMpu0w=='
 INFLUXDB_ORG = 'GGWP'
 INFLUXDB_BUCKET = "temperature_data"
 
-
 def get_temperature_data(request):
+    if not request.user.is_authenticated:
+        return redirect('account:login')
     try:
         # Initialize the InfluxDB client
         client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
@@ -19,7 +20,7 @@ def get_temperature_data(request):
         # Write the query to retrieve the last 100 points
         query = f'''
         from(bucket: "{INFLUXDB_BUCKET}")
-          |> range(start: -1h)
+          |> range(start: -24h)
           |> filter(fn: (r) => r._measurement == "temperature")
           |> keep(columns: ["_time", "_value"])
           |> sort(columns: ["_time"], desc: true)
@@ -43,6 +44,8 @@ def get_temperature_data(request):
         return JsonResponse({"error": str(e)}, status=500)
     
 def temperature_data(request):
+    if not request.user.is_authenticated:
+        return redirect('account:login')
     try:
         client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
         query_api = client.query_api()
@@ -50,7 +53,7 @@ def temperature_data(request):
         # Query to get temperature data
         query = f'''
         from(bucket: "{INFLUXDB_BUCKET}")
-          |> range(start: -1h)
+          |> range(start: -24h)
           |> filter(fn: (r) => r._measurement == "temperature")
           |> keep(columns: ["_time", "_value"])
           |> sort(columns: ["_time"], desc: true)
