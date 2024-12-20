@@ -179,7 +179,7 @@ def serve_plot(request):
                 pressures.append(record.get_value())
 
         # Create the plot
-        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(16, 10))
+        fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(16, 10))
         
         ax[0].plot(times, temperatures, label="Temperature (°C)", color="blue")
         ax[0].set_xlabel("Time")
@@ -199,7 +199,7 @@ def serve_plot(request):
         buffer = BytesIO()
         fig.savefig(buffer, format="png")
         buffer.seek(0)
-        fig.close()
+        plt.close()
 
         # Return the image as an HTTP response
         return HttpResponse(buffer, content_type="image/png")
