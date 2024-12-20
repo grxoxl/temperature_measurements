@@ -6,7 +6,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 from django.conf import settings
 
 class Command(BaseCommand):
-    help = 'Generates synthetic temperature data'
+    help = 'Generates synthetic temperature and pressure data'
     url = settings.INFLUXDB["url"]
     token = settings.INFLUXDB["token"]
     org = settings.INFLUXDB["org"]
@@ -21,7 +21,7 @@ class Command(BaseCommand):
                 org= self.org
             )
             write_api = client.write_api(write_options=SYNCHRONOUS)
-            delete_api = client.delete_api()
+            
             for i in range(100):
                 temperature = np.random.normal(21, 0.5)
    
@@ -31,15 +31,19 @@ class Command(BaseCommand):
                     .field("value", temperature) \
                     .time(timestamp.isoformat() + 'Z')
                 write_api.write(bucket="temperature_data", record=point)
-            start_time = "1970-01-01T00:00:00Z"  # Start of time
-            end_time = (datetime.utcnow() - timedelta(hours=24)).isoformat() + 'Z'
-            delete_api.delete(
-                start=start_time,
-                stop=end_time,
-                bucket="temperature_data",
-                org=self.org,
-                predicate='_measurement="temperature"'
-            )
+            
+            self.stdout.write(self.style.NOTICE('Generating synthetic pressure data...'))
+            
+            for i in range(100):
+                pressure = np.random.normal(150, 0.5)
+   
+                timestamp = datetime.utcnow() - timedelta(minutes=i)
+                point = Point('pressure') \
+                    .tag("location", "home") \
+                    .field("value", pressure) \
+                    .time(timestamp.isoformat() + 'Z')
+                write_api.write(bucket="pressure_data", record=point)
+                
             self.stdout.write(self.style.SUCCESS('Synthetic data generated and stored in InfluxDB'))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'Error generating data: {e}'))

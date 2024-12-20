@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Temperature Data{% endblock title %}
+{% block title %}Pressure Data{% endblock title %}
 
-{% block device_section %}{% endblock device_section %}
+{% block device_section_2 %}{% endblock device_section_2 %}
 
 {% block content %}
 <style>
@@ -109,14 +109,14 @@
     }
 </style>
 
-<h1 style="text-align: center;">Temperature Readings</h1>
+<h1 style="text-align: center;">Pressure Readings</h1>
 <div class="data-container">
     <div class="data-table">
         <table>
             <thead>
                 <tr>
                     <th>Timestamp</th>
-                    <th>Temperature (°C)</th>
+                    <th>Pressure (Pa)</th>
                 </tr>
             </thead>
             <tbody id="data-table-body">
@@ -124,7 +124,7 @@
                     {% for reading in readings|slice:":5" %}
                     <tr>
                         <td>{{ reading.timestamp|date:"H:i:s" }}</td>
-                        <td>{{ reading.temperature|floatformat:2 }}</td>
+                        <td>{{ reading.pressure|floatformat:2 }}</td>
                     </tr>
                     {% endfor %}
                     <tr>
@@ -133,14 +133,14 @@
                     {% for reading in readings|slice:"-5:" %}
                     <tr>
                         <td>{{ reading.timestamp|date:"H:i:s" }}</td>
-                        <td>{{ reading.temperature|floatformat:2 }}</td>
+                        <td>{{ reading.pressure|floatformat:2 }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     {% for reading in readings %}
                     <tr>
                         <td>{{ reading.timestamp|date:"H:i:s" }}</td>
-                        <td>{{ reading.temperature|floatformat:2 }}</td>
+                        <td>{{ reading.pressure|floatformat:2 }}</td>
                     </tr>
                     {% endfor %}
                 {% endif %}
@@ -149,12 +149,11 @@
     </div>
 
     <div class="chart-container">
-        <h2>Temperature Over Time</h2>
+        <h2>Pressure Over Time</h2>
         <div class="chart-wrapper">
-            <canvas id="temperatureChart"></canvas>
+            <canvas id="pressureChart"></canvas>
     </div>
 </div>
-
 
 <div style="text-align: center; margin-top: 2rem;">
     <a href="https://web.telegram.org/k/#@TempParserBot" class="telegram-button" target="_blank">
@@ -165,14 +164,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    const ctx = document.getElementById('temperatureChart').getContext('2d');
-    let temperatureChart = new Chart(ctx, {
+    const ctx = document.getElementById('pressureChart').getContext('2d');
+    let pressureChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: [{% for reading in readings %}"{{ reading.timestamp|date:"H:i:s" }}",{% endfor %}],
             datasets: [{
-                label: 'Temperature (°C)',
-                data: [{% for reading in readings %}{{ reading.temperature|floatformat:2 }},{% endfor %}],
+                label: 'pressure (Pa)',
+                data: [{% for reading in readings %}{{ reading.pressure|floatformat:2 }},{% endfor %}],
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 fill: true,
@@ -200,7 +199,7 @@
                     beginAtZero: false,
                     title: {
                         display: true,
-                        text: 'Temperature (°C)'
+                        text: 'Pressure (Pa)'
                     }
                 }
             },
@@ -212,9 +211,9 @@
         }
     });
 
-    function fetchTemperatureData() {
+    function fetchPressureData() {
         $.ajax({
-            url: "{% url 'temperature_data' %}",
+            url: "{% url 'pressure_data' %}",
             method: "GET",
             dataType: "json",
             beforeSend: function() {
@@ -222,11 +221,11 @@
             },
             success: function(response) {
                 const labels = response.readings.map(reading => reading.timestamp);
-                const data = response.readings.map(reading => reading.temperature);
+                const data = response.readings.map(reading => reading.pressure);
 
-                temperatureChart.data.labels = labels.slice(-50);
-                temperatureChart.data.datasets[0].data = data.slice(-50);
-                temperatureChart.update();
+                pressureChart.data.labels = labels.slice(-50);
+                pressureChart.data.datasets[0].data = data.slice(-50);
+                pressureChart.update();
 
                 const tableBody = document.getElementById('data-table-body');
                 tableBody.innerHTML = "";
@@ -236,7 +235,7 @@
                         const row = `
                             <tr>
                                 <td>${reading.timestamp}</td>
-                                <td>${reading.temperature.toFixed(2)}</td>
+                                <td>${reading.pressure.toFixed(2)}</td>
                             </tr>`;
                         tableBody.insertAdjacentHTML('beforeend', row);
                     });
@@ -251,7 +250,7 @@
                         const row = `
                             <tr>
                                 <td>${reading.timestamp}</td>
-                                <td>${reading.temperature.toFixed(2)}</td>
+                                <td>${reading.pressure.toFixed(2)}</td>
                             </tr>`;
                         tableBody.insertAdjacentHTML('beforeend', row);
                     });
@@ -261,7 +260,7 @@
                         const row = `
                             <tr>
                                 <td>${reading.timestamp}</td>
-                                <td>${reading.temperature.toFixed(2)}</td>
+                                <td>${reading.pressure.toFixed(2)}</td>
                             </tr>`;
                         tableBody.insertAdjacentHTML('beforeend', row);
                     });
@@ -270,13 +269,13 @@
                 $("#refresh-indicator").text("Data refreshed!");
             },
             error: function(err) {
-                console.error("Error fetching temperature data:", err);
+                console.error("Error fetching pressure data:", err);
                 $("#refresh-indicator").text("Error refreshing data");
             }
         });
     }
 
-    setInterval(fetchTemperatureData, 1000);
-    fetchTemperatureData();
+    setInterval(fetchePressureData, 1000);
+    fetchePressureData();
 </script>
 {% endblock content %}

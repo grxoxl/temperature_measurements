@@ -1,10 +1,14 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
 
 def home(request):
     
     if not request.user.is_authenticated:
         return redirect('account:login')
-    return render(request, 'base.html')
+    context = {
+        'show_devices_header': True,
+        'show_second_device_button': True,
+        'show_first_device_button': True,
+    }
+    return render(request, 'base.html', context)
 
 

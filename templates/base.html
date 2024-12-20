@@ -96,25 +96,34 @@
                 <a href="{% url 'basepage:home' %}">Home</a>
                 <a href="{% url 'account:register' %}">Register new account</a>
                 <a href="{% url 'account:logout' %}">Logout</a>
-            {% else %}
-                </a>
             {% endif %}
         </div>
     </header>
 
     <main>
         {% block device_section %}
-        <!-- By default, show the device card and button -->
+        {% if show_devices_header %}
         <h2>Devices</h2>
+        {% endif %}
+        {% if show_first_device_button %}
         <hr style="border: none; border-top: 1px solid #ccc; margin: 1rem 0;">
-
         <div class="device-card">
             <div class="temp">20°C</div>
             <div class="location">Lounge room</div>
-            <!-- When "Show Details" is clicked, go to the temperature data page -->
             <a class="btn-details" href="{% url 'temperature_data' %}">Show Details</a>
         </div>
+        {% endif %}
         {% endblock device_section %}
+
+        {% block device_section_2 %}
+        {% if show_second_device_button %}
+        <div class="device-card">
+            <div class="temp">100 Pa</div>
+            <div class="location">Lounge room</div>
+            <a class="btn-details" href="{% url 'pressure_data' %}">Show Details</a>
+        </div>
+        {% endif %}
+        {% endblock device_section_2 %}
 
         {% block content %}{% endblock content %}
     </main>
