@@ -94,13 +94,13 @@ WSGI_APPLICATION = 'temperature_app.wsgi.application'
 #         "USER": "sh_rdb_user",
 #         "PASSWORD": "8857",
 #         "HOST": "localhost",
-#         "PORT": "5432"             # Default PostgreSQL port
+#         "PORT": "5432"           
 #     }
 # }
 
 # INFLUXDB = {
 #     'url': 'http://localhost:8086',        # InfluxDB URL
-#     'token': 'zzB-NhjH4PwejAcsFGJxNMtXIgCnvM1VBtvSbVPN3AvYqzyEstiJnCKpX3el4ZAHGijqrBAvE6FBflPHYxH0tQ==',                 # Replace with the token you generated
+#     'token': 'zzB-NhjH4PwejAcsFGJxNMtXIgCnvM1VBtvSbVPN3AvYqzyEstiJnCKpX3el4ZAHGijqrBAvE6FBflPHYxH0tQ==',             
 #     'org': 'GGWP',                         # Organization name you created
 #     'bucket': 'temperature_data'           # Bucket name you created
 # }
@@ -108,18 +108,19 @@ WSGI_APPLICATION = 'temperature_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'temperature_db',      # Your database name
-        'USER': 'temperature_user',    # Your database username
-        'PASSWORD': 'SQ2E4TF',   # Your database password
-        'HOST': 'localhost',           # Default PostgreSQL host
-        'PORT': '5432',                # Default PostgreSQL port
+        "NAME": "sh_rdb",
+        "USER": "sh_rdb_user",
+        "PASSWORD": "8857",
+        "HOST": "localhost",
+        "PORT": "5432"             
     }
 }
 INFLUXDB = {
-    'url': 'http://localhost:8086',        # InfluxDB URL
-    'token': '0XwDiOcizfZ7Yl3WsdwPsrXKVtPYVyVFWau0aOgrmRGVG1x3Ri7gG0HWegLryyT5592CGgFDmzBHQtHMW_agAg==',                 # Replace with the token you generated
-    'org': 'GGWP',                         # Organization name you created
-    'bucket': 'temperature_data'           # Bucket name you created
+    'url': 'http://localhost:8086',     
+    'token': 'eysyl_gzK_cXoZXY0VAyEK3OSHai7B4wtCOD6xrRsrEdIjn5eSrR7QwLb5MDXw94vJcX88XCyxV2A5p9JMpu0w==',               
+    'org': 'GGWP',                        
+    'bucket_temperature': 'temperature_data', 
+    'bucket_pressure': 'pressure_data'
 }
 
 
@@ -140,11 +141,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-CRONJOBS = [
-    ('*/5 * * * *', 'temperature_measurements.management.commands.generate_data')
-]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

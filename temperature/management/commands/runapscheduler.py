@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def my_job():
     try:
         logger.info("Running data generation job...")
-        call_command('generate_data')  # This should match the name of your custom command
+        call_command('generate_data') 
         logger.info("Data generation completed successfully.")
     except Exception as e:
         logger.error(f"Error running data generation job: {e}")
@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
         scheduler.add_job(
             my_job,
-            trigger=CronTrigger(second="*/1"),  # Runs every 10 seconds for demonstration
+            trigger=CronTrigger(second="*/1"),
             id="my_job",
             max_instances=1,
             replace_existing=True,
